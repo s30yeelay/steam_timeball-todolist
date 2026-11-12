@@ -1,0 +1,36 @@
+name: Build and self-check
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: cp .openai/hosting.example.json .openai/hosting.json
+      - run: npm run build
+      - run: npm test
+      - run: npm run validate
+  desktop:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: desktop
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./build.ps1
+      - name: Run desktop self-check
+        run: |
+          $test = Start-Process ./SteamTimeBall.exe -ArgumentList '--self-test' -Wait -PassThru
+          if ($test.ExitCode -ne 0) {
+            if (Test-Path ./test-error.txt) { Get-Content ./test-error.txt }
+            throw 'Desktop self-check failed'
+          }
+          Get-Content ./test-results.txt

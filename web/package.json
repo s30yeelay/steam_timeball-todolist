@@ -1,0 +1,11 @@
+{
+  "name": "steam-timeball-todolist-web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node scripts/test.mjs",
+    "validate": "node scripts/validate-artifact.mjs",
+    "dev": "node scripts/build.mjs && node scripts/test.mjs --serve"
+  }
+}
